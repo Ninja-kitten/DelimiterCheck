@@ -1,3 +1,5 @@
+#ifndef _CHECKER
+#define _CHECKER
 #include <iostream>
 #include "GenStack.h"
 using namespace std;
@@ -22,9 +24,10 @@ bool isMatch(char c);
 char findMatch();
 //finds the match appropriate for the top of the stack
 
-void fileCheck(const char* str);
+void fileCheck(string str) throw(UnmatchedDelimiter);
 //goes line by line through a file and checks to see if it is properly formatted
 
 private:
 GenStack <char> * G;
 };
+#endif

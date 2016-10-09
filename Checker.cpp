@@ -1,4 +1,6 @@
 #include "Checker.h"
+#include "RuntimeException.h"
+#include "GenStack.h"
 #include <iostream>
 #include <fstream>
 using namespace std;
@@ -58,17 +60,28 @@ char Checker::findMatch(){
 		return '}';
 	}
 }
-void Checker::fileCheck(const char* str){
-	ifstream ifs(str);
+void Checker::fileCheck(string str) throw(UnmatchedDelimiter){
+	ifstream* ifs = new ifstream(str.c_str());
+	if(ifs->fail())
+	{
+		cout<<"File opening failed. Please try again!"<<endl;
+		cin>>str;
+		ifstream* temp = new ifstream(str.c_str());
+		ifs = temp;
+	}
 	char c;
-	ifs.get(c);
+	ifs->get(c);
+	
 	int line = 1;
-	while (c != '#')
+	
+	if(c != '{') throw;
+	while (!ifs->eof())
 	//while it's not the end of a file
 	{
-		if(isOpener(c)){
+			if(isOpener(c)){
 		//place c on top of the stack if its an opening delimiter
 			G->push(c);
+			
 			if(G->isFull()){
 				adjustSize();
 			}
@@ -78,9 +91,9 @@ void Checker::fileCheck(const char* str){
 			if(G->isEmpty()){
 			//if the stack is empty report unmatched delimiter in line
 				cout<<"Error found in Line : "<<line<<" found unmatched "<<c<<" with no opening delimiter"<<endl;
-				throw;
+				throw UnmatchedDelimiter("");
 			}
-			else if(isMatch(G->peek())){
+			else if(isMatch(c)){
 			//if the delimiter matches the top pop it off
 				G->pop();
 			}
@@ -88,7 +101,7 @@ void Checker::fileCheck(const char* str){
 			//if they aren't a match report an error
 				char d = findMatch();
 				cout<<"Error found in Line : "<<line<<" expected "<<d<<" found "<<c<<endl;
-				throw;
+				throw UnmatchedDelimiter("");
 			}
 		}
 		else if(c == '\n')
@@ -96,6 +109,7 @@ void Checker::fileCheck(const char* str){
 		{
 			line++;
 		}
+		ifs->get(c);
 	}
 	if(G->isEmpty()){
 	//at the end of the file if the stack is empty, everything is fine
@@ -109,7 +123,7 @@ void Checker::fileCheck(const char* str){
 			G->pop();
 		}	
 		cout<<endl;
-		throw;
+		throw UnmatchedDelimiter("");
 	}
 	
 }

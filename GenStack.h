@@ -1,5 +1,8 @@
+#ifndef _GEN_STACK
+#define _GEN_STACK
 #include <iostream>
 #include <exception>
+#include "RuntimeException.h"
 using namespace std;
 
 template <typename E>
@@ -16,14 +19,18 @@ GenStack();
 GenStack(int s);
 ~GenStack();
 int getSize(); //returns size of array
-E pop(); //takes off the top
-E peek();
-void push(E data);
+int getMax();
+E pop() throw (StackEmpty); //takes off the top
+E peek() throw (StackEmpty);
+void push(E data) throw(StackFull);
 bool isEmpty();
 bool isFull();
 };
 template <typename E>
-GenStack<E>::GenStack(){}
+GenStack<E>::GenStack(){
+size = 0;
+top = -1;
+}
 
 template <typename E>
 GenStack<E>::~GenStack(){}
@@ -43,33 +50,37 @@ return size;
 }
 
 template <typename E>
-E GenStack<E>::pop(){
+int GenStack<E>::getMax(){
+return max;
+}
+template <typename E>
+E GenStack<E>::pop() throw(StackEmpty){
 
 	if(!isEmpty()){
 		size--;
 		return S[top--];
 	}
 	else{
-		throw "Stack is Empty";
+		throw StackEmpty("Stack is Empty");
 	}
 }
 
 template <typename E>
-E GenStack<E>::peek(){
+E GenStack<E>::peek() throw(StackEmpty){
 	if(!isEmpty()){
 	return S[top];
 	}
 	else{
-		throw "Stack is Empty";
+		throw StackEmpty("Stack is Empty");
 	}
 }
 template <typename E>
-void GenStack<E>::push(E data){
+void GenStack<E>::push(E data) throw(StackFull){
 	if (!isFull()){
 		S[++top] = data;
 		size++;
 	}
-	else throw "Stack is Full";
+	else throw StackFull("Stack is Full");
 }
 
 template <typename E>
@@ -81,3 +92,5 @@ template <typename E>
 bool GenStack<E>::isFull(){
 	return size == max;
 }
+
+#endif
